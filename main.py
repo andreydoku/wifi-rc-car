@@ -56,15 +56,11 @@ app = Microdot()
 cors = CORS(app, allowed_origins=['http://localhost:5173', "http://192.168.4.22:5173"], allowed_methods=["GET", "POST", "OPTIONS"])
 # what fixed it: adding localhost above ^^^
 
+
 @app.get('/api/status')
 async def getStatus(request):
     
-	response = {
-		"frontLeft": car.frontLeftMotor.velocity,
-		"frontRight": car.frontRightMotor.velocity,
-		"backLeft": car.backLeftMotor.velocity,
-		"backRight": car.backRightMotor.velocity,
-	}
+	response = car.getStatus()
 	headers = {
 		'Content-Type': 'application/json', 
 		"Access-Control-Allow-Origin": "*"
@@ -77,26 +73,29 @@ async def setMotor(request):
 	requestBody = request.json
 	print(requestBody)
 	
-	frontLeftV = requestBody["frontLeft"]
-	frontRightV = requestBody["frontRight"]
-	backLeftV = requestBody["backLeft"]
-	backRightV = requestBody["backRight"]
+	if (requestBody is None):
+		return json.dumps({"error": "missing request body"}), 400, {"Content-Type": "application/json"}
+	
+	if( not all (k in requestBody for k in ("FL", "FR", "BL", "BR")) ):
+		return json.dumps({"error": "missing one of FL, FR, BL, BR in request body"}), 400, {"Content-Type": "application/json"}
+	
+	
+	frontLeftV = requestBody["FL"]
+	frontRightV = requestBody["FR"]
+	backLeftV = requestBody["BL"]
+	backRightV = requestBody["BR"]
 	
 	
 	car.setMotors( frontLeftV , frontRightV , backLeftV , backRightV )
 	
-	response = {
-		"frontLeft": car.frontLeftMotor.velocity,
-		"frontRight": car.frontRightMotor.velocity,
-		"backLeft": car.backLeftMotor.velocity,
-		"backRight": car.backRightMotor.velocity,
-	}
+	response = car.getStatus()
 	headers = {
 		'Content-Type': 'application/json', 
 		"Access-Control-Allow-Origin": "*",
 		"Access-Control-Allow-Methods": "POST"
 	}
 	return json.dumps(response), 201, headers
+
 
 print("starting server...")
 app.run(debug=True)

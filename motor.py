@@ -22,9 +22,13 @@ class Motor:
 	#    Option 2: make logic pins match (set both to 0, or set both to 1)
 
 	
-	velocity = 0.0  # [-1, 1], -1 = full speed back, 0 stop, +1 full speed forward
+	velocity = 0.0  # [-1, 1], 
+	# +1 = full speed forward
+	#  0 = stop, 
+	# -1 = full speed back
 	
-	def __init__(self, enablePin_num, logicPin1_num, logicPin2_num) -> None:
+	def __init__(self, name, enablePin_num, logicPin1_num, logicPin2_num) -> None:
+		self.name = name
 		self.enablePin = PWM(Pin(enablePin_num))
 		self.enablePin.freq(1000)
 		self.logicPin1 = Pin(logicPin1_num, Pin.OUT)
@@ -37,7 +41,7 @@ class Motor:
 	
 	def setVelocity(self, velocity):
 		
-		print(f"Motor - setVelocity {self.velocity} => {velocity}")
+		print(f"  {self.name} - setVelocity {self.velocity} => {velocity}")
 		if( self.velocity == velocity ):
 			print("    no change in speed, just return")
 			return
