@@ -1,6 +1,7 @@
 
 import json
 from cors import CORS
+from motorTest import motorTest, motorTest2
 import network
 from machine import Pin
 from microdot import Microdot
@@ -20,6 +21,9 @@ print("Car initialized")
 
 onboardLed = Pin("LED", Pin.OUT) # onboard LED for Pico W
 
+# motorTest2(car)
+
+
 
 def connectToWifi():
     
@@ -32,19 +36,17 @@ def connectToWifi():
 	# might already be connected somehow.
 	if wlan.isconnected() == False:
 		wlan.connect(ssid, password)
-
+		
 	# Wait for connection.
 	while wlan.isconnected() == False:
 		print("trying to connect...")
 		sleep(1)
 		pass
 	
-	
-	
-	print('connected!') 
-	print('IP address:', wlan.ifconfig()[0])
+	print('connected!')
+	ipConfig = wlan.ifconfig() # returns (IP address , subnet mask , gateway , DNS server )
+	print('IP address:', ipConfig[0])
 	onboardLed.value(1)
-
 
 connectToWifi()
 
@@ -58,7 +60,10 @@ cors = CORS(app, allowed_origins=['http://localhost:5173', "http://192.168.4.22:
 async def getStatus(request):
     
 	response = {
-		"status": "UP"
+		"frontLeft": car.frontLeftMotor.velocity,
+		"frontRight": car.frontRightMotor.velocity,
+		"backLeft": car.backLeftMotor.velocity,
+		"backRight": car.backRightMotor.velocity,
 	}
 	headers = {
 		'Content-Type': 'application/json', 
@@ -81,7 +86,10 @@ async def setMotor(request):
 	car.setMotors( frontLeftV , frontRightV , backLeftV , backRightV )
 	
 	response = {
-		"success": "true"
+		"frontLeft": car.frontLeftMotor.velocity,
+		"frontRight": car.frontRightMotor.velocity,
+		"backLeft": car.backLeftMotor.velocity,
+		"backRight": car.backRightMotor.velocity,
 	}
 	headers = {
 		'Content-Type': 'application/json', 
@@ -92,11 +100,4 @@ async def setMotor(request):
 
 print("starting server...")
 app.run(debug=True)
-print("server started!")
 
-
-
-
-
-	
-	

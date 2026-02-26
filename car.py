@@ -16,9 +16,9 @@ from time import sleep
 
 
 # # front left
-frontLeftMotor_enablePin_num  = 0   # 1,2EN (Pin  1 of L293 1)
-frontLeftMotor_logicPin1_num  = 1   # 1A    (Pin  2 of L293 1) 
-frontLeftMotor_logicPin2_num  = 2   # 2A    (Pin  7 of L293 1)
+frontLeftMotor_enablePin_num  = 6   # 1,2EN (Pin  1 of L293 1)
+frontLeftMotor_logicPin1_num  = 7   # 1A    (Pin  2 of L293 1) 
+frontLeftMotor_logicPin2_num  = 8   # 2A    (Pin  7 of L293 1)
 
 # # front right
 frontRightMotor_enablePin_num  = 19  # 3,4EN (Pin  9 of L293 1)
@@ -57,6 +57,9 @@ class Car:
 	
 	def setFrontLeftMotor( self, frontLeftV ):
 		self.frontLeftMotor.setVelocity( frontLeftV )
+	
+	
+	
 	
 	def jumpStartCheck(self, frontLeftV, frontRightV, backLeftV, backRightV):
 		
