@@ -27,6 +27,9 @@ class Motor:
 	#  0 = stop, 
 	# -1 = full speed back
 	
+	#enable pins are donnected to PWM pins, which are 16bit (0-65535), 
+	# so to convert from velocity to duty cycle, do: duty = speed * 65535
+	
 	def __init__(self, name, enablePin_num, logicPin1_num, logicPin2_num) -> None:
 		self.name = name
 		self.enablePin = PWM(Pin(enablePin_num))
@@ -59,14 +62,48 @@ class Motor:
 		
 		self.velocity = velocity
 	
-	def jumpstartCheck(self, newVelocity):
+	def kickstartCheck(self, newVelocity):
 		oldVelocity = self.velocity
-		if ( oldVelocity == 0 and newVelocity > 0 ):
+		oldSpeed = abs(oldVelocity)
+		newSpeed = abs(newVelocity)
+		
+		changingDirection = (oldVelocity * newVelocity < 0)
+		
+		# print(f"    {self.name} - kickstartCheck, speed change: {oldSpeed} => {newSpeed}")
+		
+		# going down in speed, don't need a kickstart
+		# only if going up in speed, and was previously stopped, and we're going up to something slow, then kickstart
+		
+		if( newSpeed == 0 ):
+			# print("      not kickstarting because we're stopping the motor, not starting it")
 			return False
 		
+		if( not changingDirection ):
+			if ( newSpeed <= oldSpeed ):
+				# print("      not kickstarting because we're not going up in speed")
+				return False
+			
+			if( oldSpeed != 0 ):
+				# print("      not kickstarting because we were already moving at a nonzero speed")
+				return False
+			
+			if( newSpeed >= 0.4 ):
+				# print("      not kickstarting because we're going up to a reasonably high speed, so we probably don't need it")
+				return False
+		
+		if( changingDirection ):
+			if( newSpeed >= 0.4 ):
+				# print("      not kickstarting because we're going up to a reasonably high speed, so we probably don't need it")
+				return False
+		
+		
 		if( newVelocity > 0 ):
-			self.enablePin.duty_u16( +65535 )
+			self.logicPin1.value(1)
+			self.logicPin2.value(0)
 		if( newVelocity < 0 ):
-			self.enablePin.duty_u16( -65535 )
+			self.logicPin1.value(0)
+			self.logicPin2.value(1)
+		kickstartSpeed = 0.4
+		self.enablePin.duty_u16( round(kickstartSpeed*65535) )
 		
 		return True

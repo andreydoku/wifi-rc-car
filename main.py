@@ -20,6 +20,18 @@ car = Car()
 print("Car initialized")
 
 onboardLed = Pin("LED", Pin.OUT) # onboard LED for Pico W
+onboardLed.value(1)
+sleep(0.2)
+onboardLed.value(0)
+sleep(0.2)
+onboardLed.value(1)
+sleep(0.2)
+onboardLed.value(0)
+sleep(0.2)
+onboardLed.value(1)
+sleep(0.2)
+onboardLed.value(0)
+sleep(0.2)
 
 # motorTest2(car)
 
@@ -53,7 +65,7 @@ connectToWifi()
 
 
 app = Microdot()
-cors = CORS(app, allowed_origins=['http://localhost:5173', "http://192.168.4.22:5173"], allowed_methods=["GET", "POST", "OPTIONS"])
+cors = CORS(app, allowed_origins=['http://localhost:8000', "http://192.168.4.22:8000"], allowed_methods=["GET", "POST", "OPTIONS"])
 # what fixed it: adding localhost above ^^^
 
 
@@ -95,6 +107,19 @@ async def setMotor(request):
 		"Access-Control-Allow-Methods": "POST"
 	}
 	return json.dumps(response), 201, headers
+
+
+@app.get('/shutdown')
+async def shutdown(request):
+	request.app.shutdown()
+	
+	response = {"message": "Server is shutting down..."}
+	headers = {
+		'Content-Type': 'application/json', 
+		"Access-Control-Allow-Origin": "*"
+	}
+	return json.dumps(response), 200, headers
+
 
 
 print("starting server...")

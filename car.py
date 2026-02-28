@@ -36,30 +36,29 @@ class Car:
 		self.motorBR  = Motor(name="backRight", **pins["motorBR"])
 		
 	def setMotors(self, vel_FL, vel_FR, vel_BL, vel_BR ):
-		
 		print(f"Car - setMotors {vel_FL}, {vel_FR}, {vel_BL}, {vel_BR}")
-		# self.jumpStartCheck( vel_FL, vel_FR, vel_BL, vel_BR )
+		
+		self.kickstartCheck( vel_FL, vel_FR, vel_BL, vel_BR )
 		
 		self.motorFL.setVelocity( vel_FL )
 		self.motorFR.setVelocity( vel_FR )
 		self.motorBL.setVelocity( vel_BL )
 		self.motorBR.setVelocity( vel_BR )
 	
-	def setFrontLeftMotor( self, vel_FL ):
-		self.motorFL.setVelocity( vel_FL )
 	
-	
-	
-	
-	def jumpStartCheck(self, vel_FL, vel_FR, vel_BL, vel_BR):
+	def kickstartCheck(self, vel_FL, vel_FR, vel_BL, vel_BR):
+		flkickstarted = self.motorFL.kickstartCheck( vel_FL )
+		frkickstarted = self.motorFR.kickstartCheck( vel_FR )
+		blkickstarted = self.motorBL.kickstartCheck( vel_BL )
+		brkickstarted = self.motorBR.kickstartCheck( vel_BR )
 		
-		flJumpstarted = self.motorFL.jumpstartCheck( vel_FL )
-		frJumpstarted = self.motorFR.jumpstartCheck( vel_FR )
-		blJumpstarted = self.motorBL.jumpstartCheck( vel_BL )
-		brJumpstarted = self.motorBR.jumpstartCheck( vel_BR )
-		
-		if( flJumpstarted or frJumpstarted or blJumpstarted or brJumpstarted ):
-			sleep(0.1)
+		if( flkickstarted or frkickstarted or blkickstarted or brkickstarted ):
+			# sleep(0.1)
+			print("kickstarted, sleeping for 20ms to let motors get going")
+			sleep(0.020)
+			
+			
+	
 	
 	
 	def getStatus(self):
